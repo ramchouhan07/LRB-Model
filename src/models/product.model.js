@@ -1,50 +1,58 @@
+import mongoose from "mongoose";
 
-import mongoose, {Schema} from "mongoose";
-import mongooseAggregatePaginate from "mongoose-aggregate-paginate-v2";
-
-const productSchema = new Schema(
-    {
-        productFile:{
-            type:String,
-            requre:true
-
-        } ,
-        image:{
-            type:String,
-            requre:true
-        },
-        title:{
-            type:String,
-            requre:true,
-            trim:true,
-            index:true  
-        },
-        description:{
-            type:String,
-            requre:true
-       
-        },views:{
-            type:Number,
-            default:0
-        },
-        idPublished:{
-            type:Boolean,
-            default:true
-        },
-        owner:{
-            types:Schema.types.ObjectId,
-            ref:"User",
-            requre:true
-        }
-
-
+const productSchema = new mongoose.Schema(
+  {
+    name: {
+      type: String,
+      required: true,
+      trim: true,
     },
 
-    {
-        timeStamps: true
+    image: {
+      type: String,
+      required: true,
+    },
 
-    }
-); 
+    price: {
+      type: Number,
+      required: true,
+    },
 
+    expiryDate: {
+      type: Date,
+    },
 
-const Product   = mongoose.model("Product",productSchema);
+    discount: {
+      type: Number,
+      default: 0,
+    },
+
+    rating: {
+      type: Number,
+      default: 0,
+      min: 0,
+      max: 5,
+    },
+
+    stock: {
+      type: Number,
+      default: 0,
+    },
+
+    description: {
+      type: String,
+      trim: true,
+    },
+      shopId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Shop",
+  },
+  },
+  {
+    timestamps: true,
+  }
+);
+
+const Product = mongoose.model("Product", productSchema);
+
+export default Product;

@@ -4,50 +4,61 @@ import bcrypt from "bcrypt";
 
 const userSchema = new Schema(
     {
-        name: {
-            type: String,
-            require: true,
-            trim: true,
-            index: true
-        },
+       
+         role: {
+    type: String,
+    enum: ["user", "shopkeeper"],
+    required: true,
+    default: "user"
+  },
         email: {
-            requre: true,
+            required: true,
             type: String,
             trim: true,
-            unique: true,
+       
+            
             lowercase: true
 
         },
+          userName: {
+            type: String,
+            trim: true,
+    
+  },
+           
+        
         fullName: {
             type: String,
             trim: true,
-            requre: true,
+            required: false,
             index: true
         },
-        avtar: {
+        avatar: {
             type: String,  //cloudinary url
             trim: true,
-            requre: true,
+            required: false,
             index: true
         },
-        coverImage: {
-            type: String,  //cloudinary url
-
-        },
-        wathcHistry: {
-            type: Schema.Types.ObjectId,
-            ref: "Product"
-        },
+     
+     
         password: {
             type: String,
-            require: [true, "Please provide a password"],
+           required: function () {
+    return this.role === "shopkeeper";
+  },
         },
-        refresqhToken: {
+        refreshToken: {
             type: String,
+        },
+       otp: {
+            type: String,
+        },
+        otpExpiry: {
+            type: Date
         }
 
     },
-    { timeStapms: true })
+    { timestamps: true })
 
 
 userSchema.pre("save", async function (next) {
@@ -57,14 +68,13 @@ userSchema.pre("save", async function (next) {
   })
 
   userSchema.methods.isPasswordCorrect = async function(password){
- return await  bcrypt.compare(password, this.password)
+ return   bcrypt.compare(password, this.password)
   }
 userSchema.methods.generateAccessToken = function(){
-    jwt.sign(
+    return jwt.sign(
         {
         _id: this.id,
         email: this.email,
-        username: this.username,
         fullName: this.fullName,
         },
         process.env.ACCESS_TOKEN_SECRET,
@@ -74,11 +84,11 @@ userSchema.methods.generateAccessToken = function(){
     )
 }
  userSchema.methods.generateRefreshToken  = function(){
-     jwt.sign(
+     return jwt.sign(
         {
         _id: this.id,
         email: this.email,
-        username: this.username,
+     
         fullName: this.fullName,
         },
         process.env.REFRESH_TOKEN_SECRET,
